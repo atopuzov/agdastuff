@@ -4,10 +4,11 @@ let
     rev = "354798437a8dc3d9ab1d1f5787209df0ac5ef742";
     ref = "master";
   };
-  # After https://github.com/NixOS/nixpkgs/pull/76653
-  # makes it pretty easy
   pkgs = import nixpkgs {};
-  myAgda = pkgs.agda.withPackages (p: [ p.standard-library ]);
+
+  # After https://github.com/NixOS/nixpkgs/pull/76653
+  # makes it pretty easy to use the agda standard library
+  agda = pkgs.agda.withPackages (p: [ p.standard-library ]);
 
   emacsWithPackages = (pkgs.emacsPackagesGen pkgs.emacs).emacsWithPackages
     (epkgs: (with epkgs.melpaStablePackages; [
@@ -19,7 +20,7 @@ let
     ]));
 
   init-el = pkgs.writeText "init.el" ''
-    (setq user-emacs-directory ".myemacs")
+    (setq user-emacs-directory "/tmp")
 
     (setq inhibit-startup-message t) ;; hide the startup message
     (load-theme 'tango-dark t)       ;; load theme
@@ -73,7 +74,7 @@ let
       mkdir -p $out/bin
       makeWrapper ${emacsWithPackages}/bin/emacs \
         $out/bin/emacs \
-        --prefix PATH : ${myAgda} \
+        --prefix PATH : ${pkgs.lib.makeBinPath [ agda ]} \
         --add-flags "-q -l ${init-el}"
     '';
     buildInputs = [ pkgs.makeWrapper ];
@@ -82,11 +83,9 @@ in
 pkgs.stdenv.mkDerivation {
   name = "agda-sandbox";
 
-  buildInputs = [ myAgda emacs ];
+  buildInputs = [ agda emacs ];
 
-  # EMACS_USER_DIRECTORY _TODO_
   shellHook = ''
     echo "Ready!"
   '';
-
 }
