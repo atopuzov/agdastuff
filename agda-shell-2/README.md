@@ -5,7 +5,7 @@ Emacs is available and set up to use agda.
 
 This will NOT with PLFA.
 
-To use the standard-library by default wither put it in `~/.agda/defaults` or create a `.agda-lib` file with the contents similar to:
+To use the standard-library by default either put it in `~/.agda/defaults` or create a `.agda-lib` file with the contents similar to:
 ```
 name: my-agda-lib
 depend: standard-library
